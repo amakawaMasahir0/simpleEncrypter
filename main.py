@@ -34,6 +34,8 @@ SALT_SIZE = 16
 KEY_SIZE = 32
 ITERATIONS = 100000
 BLOCK_SIZE = AES.block_size
+# 密码尝试次数上限
+DECRYPT_CHANCE = "10"
 
 
 def generate_key(password, salt):
@@ -71,7 +73,8 @@ def encrypt_file(file_path, password, name_key, file_num):
     os.remove(file_path)
 
 
-def decrypt_file(file_path, password, name_key):
+def decrypt_file(file_path, password, name_key, root_path, decrypt_remain_chance, info_key):
+
     with open(file_path, 'rb') as f:
         salt = f.read(SALT_SIZE)
         nonce = f.read(BLOCK_SIZE)
@@ -89,10 +92,21 @@ def decrypt_file(file_path, password, name_key):
     try:
         decrypted_filename = decrypt_name(encrypt_filename, name_key, name_nonce)
     except ValueError:
-        # raise ValueError("Incorrect password or corrupted file")
+        decrypt_remain_chance = decrypt_remain_chance - 1
+        with open(root_path + f"\\{os.path.basename(root_path)}.name", 'r') as f:
+            root_name_nonce = f.readline()
+            encrypt_root_name = f.readline()
+        os.remove(root_path + f"\\{os.path.basename(root_path)}.name")
+        encrypted_remain_chance, cipher_remain = encrypt_name(str(decrypt_remain_chance), info_key)
+        nonce_remain_chance = cipher_remain.nonce
+        with open(root_path + f"\\{os.path.basename(root_path)}.name", 'w') as f:
+            f.write(root_name_nonce)
+            f.write(encrypt_root_name)
+            f.write(base64.b64encode(nonce_remain_chance).decode() + "\n")
+            f.write(base64.b64encode(encrypted_remain_chance).decode() + "\n")
         print("Incorrect password or corrupted file!")
+        print(f"You still have {decrypt_remain_chance} tries.")
         sys.exit(1)
-
 
     # 解密文件数据
     try:
@@ -114,7 +128,29 @@ def decrypt_file(file_path, password, name_key):
 
 def process_folder(folder_path, password, encrypt=True):
     file_num = 0
+    # 采用固定的password来加密剩余解密次数
+    # 安全性不佳，容易逆向。如果程序联网，则可以使用来自服务器的加密短语
+    info_key = generate_key("0x76b1", salt=b'tale')
     name_key = generate_key(password, salt=b'salt0x7b')
+
+    # 解密时验证密码和剩余解密次数
+    decrypt_remain_chance = 0
+    if not encrypt:
+        try:
+            with open(folder_path + f"\\{os.path.basename(folder_path)}.name", 'r') as f:
+                f.readline()
+                f.readline()
+                remain_chance_nonce = base64.b64decode(f.readline()[:-1].encode())
+                encrypt_remain_chance = base64.b64decode(f.readline()[:-1].encode())
+        except:
+            print("ERROR: critical file for decrypt not found!")
+            sys.exit(1)
+        # 如果这个文件存在，那么一定可以解密出来剩余机会
+        decrypt_remain_chance = int(decrypt_name(encrypt_remain_chance, info_key, remain_chance_nonce))
+        # 现如果剩余0次机会
+        if not decrypt_remain_chance:
+            print("You have run out of chances for decrypting!")
+            sys.exit(1)
 
     for root, _, files in os.walk(folder_path):
         # 加密文件内容和文件名称
@@ -131,23 +167,29 @@ def process_folder(folder_path, password, encrypt=True):
                 # 只处理加密过的文件
                 if not file_path.endswith('.enc'):
                     continue
-                decrypt_file(file_path, password, name_key)
+                decrypt_file(file_path, password, name_key, folder_path, decrypt_remain_chance, info_key)
                 print(f'Decrypting file: {file_path}')
                 file_num = file_num + 1
-
 
     if encrypt:
         print(f"{file_num} file(s) has been encrypted.")
         if not file_num:
             print("Unexpected occasion occurs.")
             print("Either there is no file, or you try to encrypt encrypted file(s).")
-        # 加密最外层文件夹名称
+
+        # 加密最外层文件夹名称,设定最多解密次数,和已经使用的解密次数
+        encrypted_remain_chance, cipher_remain = encrypt_name(DECRYPT_CHANCE, info_key)
+        nonce_remain_chance = cipher_remain.nonce
         encrypted_root_name, cipher_root = encrypt_name(os.path.basename(folder_path), name_key)
         nonce_root = cipher_root.nonce
         root_father_path = folder_path[:-len(os.path.basename(folder_path))]
-        with open(root_father_path + "encryptedFolder0.name", 'wb') as f:
-            f.write(nonce_root)
-            f.write(encrypted_root_name)
+        # 此处写入文本文件，将二进制数据解码。解密的时候需要将得到的文本编码
+        # 额外注意，nonce还需要进行解base64编码
+        with open(folder_path + "\\encryptedFolder0.name", 'w') as f:
+            f.write(base64.b64encode(nonce_root).decode() + "\n")
+            f.write(encrypted_root_name.decode() + "\n")
+            f.write(base64.b64encode(nonce_remain_chance).decode() + "\n")
+            f.write(base64.b64encode(encrypted_remain_chance).decode() + "\n")
         print(f"\n{folder_path} directory encrypting...")
         os.rename(folder_path, root_father_path + "encryptedFolder0")
         # 下面的参数，应该用重命名后的父文件夹名
@@ -164,15 +206,10 @@ def process_folder(folder_path, password, encrypt=True):
 
         # 解密根文件夹名
         root_father_path = folder_path[:-len(os.path.basename(folder_path))]
-        with open(root_father_path + f"{os.path.basename(folder_path)}.name", 'rb') as f:
-            root_name_nonce = f.read(BLOCK_SIZE)
-            # remain_tries = f.read(1)
-            encrypt_root_name = f.read()
-        # if not remain_tries:
-        #     print("Sorry, you have run out of chances for decrypting.")
-        # else:
-        #     os.remove(root_father_path + f"{os.path.basename(folder_path)}.name")
-        os.remove(root_father_path + f"{os.path.basename(folder_path)}.name")
+        with open(folder_path + f"\\{os.path.basename(folder_path)}.name", 'r') as f:
+            root_name_nonce = base64.b64decode(f.readline()[:-1].encode())
+            encrypt_root_name = f.readline()[:-1].encode()
+        os.remove(folder_path + f"\\{os.path.basename(folder_path)}.name")
         decrypted_root_name = decrypt_name(encrypt_root_name, name_key, root_name_nonce)
         print(f"\n{folder_path} directory decrypting...")
         os.rename(folder_path, root_father_path + decrypted_root_name)
