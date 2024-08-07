@@ -21,9 +21,10 @@ DO NOT RUN simpleEnocoder.exe DIRECTLY!!!
    
 4. Encrypt: simpleEncrypter.exe path_to_folder --option encrypt --password yourpwd.NO SPACE, \ OR /  IN PATH OR PASSWORD
    
-5. Decrypt: simpleEncrypter.exe path_to_folder --option decrypt  --password yourpwd.
+5. Decrypt: simpleEncrypter.exe path_to_folder --option decrypt  --password yourpwd. path_to_folder should include "encryptFolder0"
    
-6. SetSecurityQues(while encrypting files):simpleEncrypter.exe path_to_folder --option setSecurityQues --password yourpwd, then follow instruction
+6. SetSecurityQues(while encrypting files):simpleEncrypter.exe path_to_folder --option setSecurityQues --password yourpwd, then follow instruction.
+Security question is suggested to be latin string, answer must be latin string.
     
 7.reclaimPassword:simpleEncrypter.exe path_to_folder --option reclaimPassword, then follow instruction
 
