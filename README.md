@@ -7,28 +7,20 @@ For encrypt your files and folders!
 * you can set security question and its answer when encrypting files. you can easily reclaim your password through answer the security question you set
 
 ### Using
-=========******************=========
 
-DO NOT RUN simpleEnocoder.exe DIRECTLY!!!
 
-=========******************=========
 
 1.BACKUP YOUR FILES BEFORE USING THIS SOFTWARE.
 
-2. open command line in administrator mode.
+2. open simpleencrypter.exe  in administrator mode.
 
-3. type: cd path_to_simpleEncoder.exe.
-   
-4. Encrypt: simpleEncrypter.exe path_to_folder --option encrypt --password yourpwd.NO SPACE, \ OR /  IN PATH OR PASSWORD
-   
-5. Decrypt: simpleEncrypter.exe path_to_folder --option decrypt  --password yourpwd. path_to_folder should include "encryptFolder0"
-   
-6. SetSecurityQues(while encrypting files):simpleEncrypter.exe path_to_folder --option setSecurityQues --password yourpwd, then follow instruction.
-Security question is suggested to be latin string, answer must be latin string.
-    
-7.reclaimPassword:simpleEncrypter.exe path_to_folder --option reclaimPassword, then follow instruction
+3. Encrypt: Enter the path and password of the folder to be encrypted according to the prompts in the window. **The path and password cannot contain illegal characters, such as spaces, left and right slashes**
+
+4. Decrypt: Enter the path and password of the file to be decrypted according to the prompts in the window. **The full path should include "encryptFolder0"**
+
+5. Set the decryption question while encrypting: The operation steps are the same as encryption. After the file encryption is completed, set the security question and answer. **Security questions are recommended to be in English, and the answer must be a Latin string**
+
+6. Retrieve password: Enter the path of the file to be decrypted, and answer the security question correctly to retrieve the password
 
 #### welcome reporting bugs!
-### BUGS
 
-> * sometimes trying to use wrong password to decrypt, wrong result generated instead of reporting error.
