@@ -3,22 +3,24 @@ For encrypt your files and folders!
 * encrypt your files through a password
 * simutaneously encrypt file content, file name and folder name
 * simple decrypt via the passwprd your set
+* decrypt chances limit: only 10 chances to decrypt, protect your file
+* you can set security question and its answer when encrypting files. you can easily reclaim your password through answer the security question you set
 
-WAYS OF USE
+### Using
 
-=========******************=========
 
-DO NOT RUN simpleEnocoder.exe DIRECTLY!!!
 
-=========******************=========
+1.BACKUP YOUR FILES BEFORE USING THIS SOFTWARE.
 
-1. open command line in administrator mode.
+2. open simpleencrypter.exe  in administrator mode.
 
-2. type: cd path_to_simpleEncoder.exe. 
+3. Encrypt: Enter the path and password of the folder to be encrypted according to the prompts in the window. **The path and password cannot contain illegal characters, such as spaces, left and right slashes**
 
-3.if encrypt, type: simpleEncoder.exe path_to_folder password.
+4. Decrypt: Enter the path and password of the file to be decrypted according to the prompts in the window. **The full path should include "encryptFolder0"**
 
-if decrypt, type simpleEncoder.exe path_to_folder password --decrypt
-type: simpleEncoder --help for help.
+5. Set the decryption question while encrypting: The operation steps are the same as encryption. After the file encryption is completed, set the security question and answer. **Security questions are recommended to be in English, and the answer must be a Latin string**
 
-#### still developing.....
+6. Retrieve password: Enter the path of the file to be decrypted, and answer the security question correctly to retrieve the password
+
+#### welcome reporting bugs!
+
