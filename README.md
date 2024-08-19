@@ -29,3 +29,6 @@ Security question is suggested to be latin string, answer must be latin string.
 7.reclaimPassword:simpleEncrypter.exe path_to_folder --option reclaimPassword, then follow instruction
 
 #### welcome reporting bugs!
+### BUGS
+
+> * sometimes trying to use wrong password to decrypt, wrong result generated instead of reporting error.
