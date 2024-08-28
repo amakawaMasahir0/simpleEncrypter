@@ -1,5 +1,5 @@
 #
-# copyright @wanderingxs1:https://github.com/wanderingxs1
+# copyright https://github.com/amakawaMasahir0/simpleEncrypter
 # commercial use is strictly prohibited
 #
 
