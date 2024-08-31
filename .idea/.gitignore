@@ -6,3 +6,14 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+# ignore .spec
+*.spec
+
+# ignore .ico
+*.ico
+
+# ignore bulid
+**/build/
+
+# ignore __pycache__
+**/__pycache__/
