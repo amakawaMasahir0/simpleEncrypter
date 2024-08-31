@@ -1,0 +1,14 @@
+# ignore pycharm project info
+/.idea
+
+# ignore .spec
+*.spec
+
+# ignore .ico
+*.ico
+
+# ignore bulid
+**/build/
+
+# ignore __pycache__
+**/__pycache__/
